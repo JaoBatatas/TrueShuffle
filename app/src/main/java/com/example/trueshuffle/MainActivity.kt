@@ -42,11 +42,13 @@ class MainActivity : ComponentActivity() {
     private var statusMessage by mutableStateOf("")
     private var isLoading by mutableStateOf(false)
     private var isListenerEnabled by mutableStateOf(false)
+    private var isSpotifyConnected by mutableStateOf(false)
     private lateinit var authManager: AuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         authManager = ServiceLocator.getAuthManager(this)
+        isSpotifyConnected = !authManager.getAccessToken().isNullOrEmpty()
         if (statusMessage.isEmpty()) {
             statusMessage = getString(R.string.status_ready)
         }
@@ -83,7 +85,10 @@ class MainActivity : ComponentActivity() {
                             enabled = !isLoading,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(stringResource(R.string.btn_connect_spotify))
+                            Text(
+                                if (isSpotifyConnected) stringResource(R.string.btn_spotify_connected)
+                                else stringResource(R.string.btn_connect_spotify)
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -129,6 +134,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        isSpotifyConnected = !authManager.getAccessToken().isNullOrEmpty()
         isListenerEnabled = NotificationManagerCompat
             .getEnabledListenerPackages(this)
             .contains(packageName)
@@ -172,6 +178,7 @@ class MainActivity : ComponentActivity() {
                 val token = exchangeCodeForToken(code, verifier)
                 if (token != null) {
                     authManager.saveAccessToken(token)
+                    isSpotifyConnected = true
                     statusMessage = getString(R.string.status_connected)
                 } else {
                     statusMessage = getString(R.string.status_auth_failed)

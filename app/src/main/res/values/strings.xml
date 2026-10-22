@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">True Shuffle</string>
+    <string name="status_ready">Pronto.</string>
+    <string name="cycle_current">Ciclo atual: %1$d de %2$d músicas</string>
+    <string name="cycle_none">Nenhum ciclo gerado ainda.</string>
+    <string name="btn_connect_spotify">1. Conectar Conta Spotify</string>
+    <string name="btn_generate_cycle">2. Gerar Novo Ciclo das Curtidas</string>
+    <string name="btn_background_active">✓ Monitoramento em 2º Plano Ativo</string>
+    <string name="btn_background_inactive">3. Ativar Monitoramento em 2º Plano</string>
+    <string name="status_getting_token">Obtendo token de acesso…</string>
+    <string name="status_connected">Conta conectada com sucesso!</string>
+    <string name="status_auth_failed">Falha ao autenticar no Spotify.</string>
+    <string name="status_downloading">Baixando e embaralhando suas 900+ músicas…</string>
+    <string name="status_playlist_generated">Playlist [True Shuffle] gerada!</string>
+    <string name="status_error">Erro: %1$s</string>
+    <string name="status_login_first">Faça o login no passo 1 primeiro!</string>
+</resources>

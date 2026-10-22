@@ -1,0 +1,38 @@
+# Arquivos gerados e executáveis
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+*.class
+
+# Caches e builds do Gradle (em qualquer nível de diretório)
+.gradle/
+build/
+**/build/
+
+# Configurações de ambiente local (caminho do SDK, etc)
+local.properties
+
+# Android Studio / IntelliJ IDEA
+*.iml
+.idea/
+!.idea/codeStyles/
+!.idea/misc.xml
+!.idea/vcs.xml
+
+# NDK / CMake (se for usar C/C++)
+.externalNativeBuild/
+.cxx/
+
+# Profiler e Capturas
+/captures/
+
+# Chaves de assinatura (NUNCA versione arquivos de keystore)
+*.jks
+*.keystore
+
+# Logs e arquivos de sistema operacional
+*.log
+.DS_Store
+Thumbs.db

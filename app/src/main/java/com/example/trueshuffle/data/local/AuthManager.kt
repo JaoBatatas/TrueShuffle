@@ -41,6 +41,13 @@ class AuthManager(context: Context) {
         return prefs.getString(KEY_ACCESS_TOKEN, null)
     }
 
+    fun clearAuthData() {
+        prefs.edit()
+            .remove(KEY_ACCESS_TOKEN)
+            .remove(KEY_CODE_VERIFIER)
+            .apply()
+    }
+
     companion object {
         private const val KEY_CODE_VERIFIER = "code_verifier"
         private const val KEY_ACCESS_TOKEN = "access_token"

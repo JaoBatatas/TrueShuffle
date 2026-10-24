@@ -1,19 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">True Shuffle</string>
-    <string name="status_ready">Pronto.</string>
-    <string name="cycle_current">Ciclo atual: %1$d de %2$d músicas</string>
-    <string name="cycle_none">Nenhum ciclo gerado ainda.</string>
-    <string name="btn_connect_spotify">1. Conectar Conta Spotify</string>
-    <string name="btn_spotify_connected">✓ Conta Spotify Conectada</string>
-    <string name="btn_generate_cycle">2. Gerar Novo Ciclo das Curtidas</string>
-    <string name="btn_background_active">✓ Monitoramento em 2º Plano Ativo</string>
-    <string name="btn_background_inactive">3. Ativar Monitoramento em 2º Plano</string>
+    <string name="app_subtitle">Embaralhamento 100% Aleatório do Spotify</string>
+    <string name="status_ready">Pronto para uso.</string>
+    <string name="status_disconnected">Conta do Spotify desconectada.</string>
+    <string name="cycle_card_title">Status do Ciclo</string>
+    <string name="cycle_current">Ciclo Atual: %1$d de %2$d músicas</string>
+    <string name="cycle_none">Nenhum ciclo ativo gerado ainda.</string>
+    <string name="cycle_description">Toca todas as suas músicas salvas sem repetições até completar o ciclo.</string>
+
+    <string name="step_1_title">1. Conta Spotify</string>
+    <string name="step_1_desc">Conecte sua conta do Spotify para ler suas músicas e criar a playlist do ciclo.</string>
+
+    <string name="step_2_title">2. Gerar Ciclo Embaralhado</string>
+    <string name="step_2_desc">Cria uma nova playlist 100% embaralhada sem nenhuma repetição.</string>
+
+    <string name="step_3_title">3. Monitoramento em 2º Plano</string>
+    <string name="step_3_desc">Detecta quando você avança de música no Spotify para atualizar o ciclo automaticamente.</string>
+
+    <string name="select_playlist_label">Origem das Músicas:</string>
+    <string name="playlist_liked_songs">💚 Músicas Curtidas (Todas)</string>
+
+    <string name="btn_connect_spotify">Conectar Spotify</string>
+    <string name="btn_disconnect_spotify">Desconectar Conta Spotify</string>
+    <string name="btn_generate_cycle">Gerar Novo Ciclo</string>
+    <string name="btn_open_spotify">Abrir no Spotify</string>
+    <string name="btn_background_inactive">Ativar Monitoramento em 2º Plano</string>
+    <string name="badge_connected">Conectado</string>
+    <string name="badge_disconnected">Não Conectado</string>
+    <string name="badge_active">Ativo</string>
+    <string name="badge_inactive">Inativo</string>
+
+    <string name="dialog_disconnect_title">Desconectar do Spotify?</string>
+    <string name="dialog_disconnect_msg">Deseja realmente desconectar sua conta do Spotify do True Shuffle?</string>
+    <string name="dialog_disconnect_confirm">Desconectar</string>
+
+    <string name="dialog_generate_title">Substituir Ciclo Atual?</string>
+    <string name="dialog_generate_msg">Você ainda possui músicas não tocadas neste ciclo (%1$d de %2$d tocadas). Deseja descartar o progresso atual e gerar um novo ciclo?</string>
+    <string name="dialog_confirm">Confirmar</string>
+    <string name="dialog_cancel">Cancelar</string>
+
     <string name="status_getting_token">Obtendo token de acesso…</string>
-    <string name="status_connected">Conta conectada com sucesso!</string>
+    <string name="status_connected">Conta do Spotify conectada com sucesso!</string>
     <string name="status_auth_failed">Falha ao autenticar no Spotify.</string>
     <string name="status_downloading">Baixando e embaralhando suas músicas…</string>
-    <string name="status_playlist_generated">Playlist [True Shuffle] gerada!</string>
+    <string name="status_playlist_generated">Playlist [True Shuffle] gerada com sucesso!</string>
     <string name="status_error">Erro: %1$s</string>
-    <string name="status_login_first">Faça o login no passo 1 primeiro!</string>
+    <string name="status_login_first">Faça login com a conta do Spotify no passo 1 primeiro!</string>
 </resources>

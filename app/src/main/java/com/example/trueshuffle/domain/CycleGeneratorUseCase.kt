@@ -10,21 +10,48 @@ class CycleGeneratorUseCase(
     private val api: SpotifyWebApi,
     private val dao: TrueShuffleDao
 ) {
-    companion object {
-        private const val TARGET_PLAYLIST_NAME = "Curtidas [True Shuffle]"
-    }
-
-    suspend fun generateNewShuffleCycle(accessToken: String) = withContext(Dispatchers.IO) {
+    suspend fun generateNewShuffleCycle(
+        accessToken: String,
+        sourcePlaylistId: String? = null,
+        sourcePlaylistName: String? = null,
+        sourceType: String = "liked"
+    ) = withContext(Dispatchers.IO) {
         val bearer = "Bearer $accessToken"
         val allTracks = mutableListOf<TrackDto>()
         var offset = 0
 
-        // 1. Paginar todas as Músicas Curtidas (de 50 em 50)
-        while (true) {
-            val response = api.getSavedTracks(bearer, offset)
-            allTracks.addAll(response.items.map { it.track })
-            if (response.next == null || response.items.isEmpty()) break
-            offset += 50
+        // 1. Paginar músicas da origem (Músicas Curtidas, Playlist ou Álbum)
+        when (sourceType) {
+            "album" -> {
+                if (!sourcePlaylistId.isNullOrEmpty()) {
+                    while (true) {
+                        val response = api.getAlbumTracks(bearer, sourcePlaylistId, offset)
+                        val tracks = response.items.filter { it.uri.isNotEmpty() }
+                        allTracks.addAll(tracks)
+                        if (response.next == null || response.items.isEmpty()) break
+                        offset += 50
+                    }
+                }
+            }
+            "playlist" -> {
+                if (!sourcePlaylistId.isNullOrEmpty()) {
+                    while (true) {
+                        val response = api.getPlaylistTracks(bearer, sourcePlaylistId, offset)
+                        val tracks = response.items.mapNotNull { it.track }.filter { it.uri.isNotEmpty() }
+                        allTracks.addAll(tracks)
+                        if (response.next == null || response.items.isEmpty()) break
+                        offset += 50
+                    }
+                }
+            }
+            else -> { // "liked"
+                while (true) {
+                    val response = api.getSavedTracks(bearer, offset)
+                    allTracks.addAll(response.items.map { it.track })
+                    if (response.next == null || response.items.isEmpty()) break
+                    offset += 50
+                }
+            }
         }
 
         if (allTracks.isEmpty()) return@withContext
@@ -38,6 +65,12 @@ class CycleGeneratorUseCase(
             allTracks[j] = temp
         }
 
+        val targetName = if (!sourcePlaylistName.isNullOrEmpty() && sourcePlaylistId != "liked") {
+            "$sourcePlaylistName [True Shuffle]"
+        } else {
+            "Curtidas [True Shuffle]"
+        }
+
         // 3. Reutilizar playlist existente (do banco local ou buscando na conta do Spotify)
         val existingState = dao.getCycleState()
         val playlistId: String
@@ -48,14 +81,14 @@ class CycleGeneratorUseCase(
             playlistUri = existingState.playlistUri
         } else {
             val remoteExisting = api.getUserPlaylists(bearer).items.firstOrNull {
-                it.name.equals(TARGET_PLAYLIST_NAME, ignoreCase = true)
+                it.name.equals(targetName, ignoreCase = true)
             }
             if (remoteExisting != null) {
                 playlistId = remoteExisting.id
                 playlistUri = remoteExisting.uri
             } else {
                 val user = api.getCurrentUser(bearer)
-                val created = api.createPlaylist(bearer, user.id, CreatePlaylistRequest(name = TARGET_PLAYLIST_NAME))
+                val created = api.createPlaylist(bearer, user.id, CreatePlaylistRequest(name = targetName))
                 playlistId = created.id
                 playlistUri = created.uri
             }

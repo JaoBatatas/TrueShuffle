@@ -41,9 +41,18 @@ class AuthManager(context: Context) {
         return prefs.getString(KEY_ACCESS_TOKEN, null)
     }
 
+    fun saveRefreshToken(token: String) {
+        prefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
+    }
+
+    fun getRefreshToken(): String? {
+        return prefs.getString(KEY_REFRESH_TOKEN, null)
+    }
+
     fun clearAuthData() {
         prefs.edit()
             .remove(KEY_ACCESS_TOKEN)
+            .remove(KEY_REFRESH_TOKEN)
             .remove(KEY_CODE_VERIFIER)
             .apply()
     }
@@ -51,5 +60,6 @@ class AuthManager(context: Context) {
     companion object {
         private const val KEY_CODE_VERIFIER = "code_verifier"
         private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
     }
 }

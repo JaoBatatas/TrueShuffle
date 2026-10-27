@@ -15,8 +15,18 @@
     <string name="step_2_title">2. Gerar Ciclo Embaralhado</string>
     <string name="step_2_desc">Cria uma nova playlist 100% embaralhada sem nenhuma repetição.</string>
 
-    <string name="step_3_title">3. Monitoramento em 2º Plano</string>
-    <string name="step_3_desc">Detecta quando você avança de música no Spotify para atualizar o ciclo automaticamente.</string>
+    <string name="step_3_title">3. Monitoramento em 2º Plano (Obrigatório pro Widget)</string>
+    <string name="step_3_desc">Essencial para o Widget: detecta quando você passa de música no Spotify para manter o progresso e o Widget 100% atualizados.</string>
+    <string name="step_3_warning_box">⚠️ Importante: Sem esta permissão, o Widget não detecta as trocas de música no Spotify e não atualizará na tela inicial.</string>
+    <string name="step_3_active_box">✓ Permissão concedida! O Widget e a sincronização do ciclo funcionarão automaticamente em 2º plano.</string>
+
+    <string name="step_4_title">4. Widget na Tela Inicial (5x1)</string>
+    <string name="step_4_desc">Adicione o Widget do True Shuffle diretamente à sua tela inicial para trocar de música e acompanhar o ciclo com 1 toque.</string>
+    <string name="btn_add_widget">📌 Adicionar Widget à Tela Inicial</string>
+
+    <string name="warning_banner_title">⚠️ Monitoramento em 2º Plano Desativado</string>
+    <string name="warning_banner_msg">O Widget precisa da permissão \"Acesso a Notificações\" para acompanhar as trocas de música no Spotify.</string>
+    <string name="btn_enable_permission">Ativar Permissão Agora</string>
 
     <string name="select_playlist_label">Origem das Músicas:</string>
     <string name="playlist_liked_songs">💚 Músicas Curtidas (Todas)</string>
@@ -25,11 +35,11 @@
     <string name="btn_disconnect_spotify">Desconectar Conta Spotify</string>
     <string name="btn_generate_cycle">Gerar Novo Ciclo</string>
     <string name="btn_open_spotify">Abrir no Spotify</string>
-    <string name="btn_background_inactive">Ativar Monitoramento em 2º Plano</string>
+    <string name="btn_background_inactive">Ativar Permissão de Acesso a Notificações</string>
     <string name="badge_connected">Conectado</string>
     <string name="badge_disconnected">Não Conectado</string>
     <string name="badge_active">Ativo</string>
-    <string name="badge_inactive">Inativo</string>
+    <string name="badge_inactive">Desativado</string>
 
     <string name="dialog_disconnect_title">Desconectar do Spotify?</string>
     <string name="dialog_disconnect_msg">Deseja realmente desconectar sua conta do Spotify do True Shuffle?</string>
@@ -39,6 +49,12 @@
     <string name="dialog_generate_msg">Você ainda possui músicas não tocadas neste ciclo (%1$d de %2$d tocadas). Deseja descartar o progresso atual e gerar um novo ciclo?</string>
     <string name="dialog_confirm">Confirmar</string>
     <string name="dialog_cancel">Cancelar</string>
+
+    <string name="dialog_listener_prompt_title">Ativar Monitoramento pro Widget?</string>
+    <string name="dialog_listener_prompt_msg">Sua playlist foi gerada! Para o Widget acompanhar o progresso automaticamente ao trocar de música, ative a permissão de Acesso a Notificações.</string>
+    <string name="dialog_listener_prompt_confirm">Ativar Agora</string>
+
+    <string name="toast_widget_not_supported">Adicione o widget manualmente segurando um espaço vazio na sua tela inicial.</string>
 
     <string name="status_getting_token">Obtendo token de acesso…</string>
     <string name="status_connected">Conta do Spotify conectada com sucesso!</string>

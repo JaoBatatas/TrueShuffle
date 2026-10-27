@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#566B8A" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+
+    <item
+        android:width="36dp"
+        android:height="36dp"
+        android:gravity="start|center_vertical"
+        android:left="10dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#39485E" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+    <item
+        android:width="20dp"
+        android:height="20dp"
+        android:gravity="start|center_vertical"
+        android:left="18dp"
+        android:drawable="@drawable/ic_spotify" />
+</layer-list>

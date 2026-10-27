@@ -1,11 +1,15 @@
 package com.example.trueshuffle
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -23,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +43,7 @@ import com.example.trueshuffle.di.AppDatabase
 import com.example.trueshuffle.di.ServiceLocator
 import com.example.trueshuffle.ui.theme.*
 import com.example.trueshuffle.widget.TrueShuffleWidget
+import com.example.trueshuffle.widget.TrueShuffleWidgetReceiver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,6 +67,7 @@ class MainActivity : ComponentActivity() {
     private var isLoading by mutableStateOf(false)
     private var isListenerEnabled by mutableStateOf(false)
     private var isSpotifyConnected by mutableStateOf(false)
+    private var showListenerPromptDialog by mutableStateOf(false)
     private lateinit var authManager: AuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -205,6 +212,35 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                if (showListenerPromptDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showListenerPromptDialog = false },
+                        title = { Text(stringResource(R.string.dialog_listener_prompt_title), color = TextPrimary) },
+                        text = { Text(stringResource(R.string.dialog_listener_prompt_msg), color = TextSecondary) },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    showListenerPromptDialog = false
+                                    startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                                }
+                            ) {
+                                Text(
+                                    stringResource(R.string.dialog_listener_prompt_confirm),
+                                    color = SpotifyGreenBright,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showListenerPromptDialog = false }) {
+                                Text(stringResource(R.string.dialog_cancel), color = TextSecondary)
+                            }
+                        },
+                        containerColor = DarkSurface,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.background
@@ -220,6 +256,16 @@ class MainActivity : ComponentActivity() {
 
                         // App Header
                         HeaderBar()
+
+                        // Alerta destacado no topo se o monitoramento estiver desativado
+                        if (!isListenerEnabled) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            BackgroundMonitoringWarningBanner(
+                                onOpenSettings = {
+                                    startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                                }
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(24.dp))
 
@@ -280,12 +326,19 @@ class MainActivity : ComponentActivity() {
 
                         Spacer(modifier = Modifier.height(14.dp))
 
-                        // Passo 3: Monitoramento em Segundo Plano
+                        // Passo 3: Monitoramento em Segundo Plano (Destaque pro Widget)
                         Step3BackgroundListenerCard(
                             isEnabled = isListenerEnabled,
                             onOpenSettings = {
                                 startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
                             }
+                        )
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Passo 4: Adicionar Widget à Tela Inicial
+                        Step4WidgetCard(
+                            onAddWidget = { requestPinWidget() }
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -318,6 +371,20 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleAuthIntent(intent)
+    }
+
+    private fun requestPinWidget() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val appWidgetManager = AppWidgetManager.getInstance(this)
+            val myProvider = ComponentName(this, TrueShuffleWidgetReceiver::class.java)
+            if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                appWidgetManager.requestPinAppWidget(myProvider, null, null)
+            } else {
+                Toast.makeText(this, getString(R.string.toast_widget_not_supported), Toast.LENGTH_LONG).show()
+            }
+        } else {
+            Toast.makeText(this, getString(R.string.toast_widget_not_supported), Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun startSpotifyLogin() {
@@ -376,6 +443,10 @@ class MainActivity : ComponentActivity() {
                 TrueShuffleWidget.pushUpdate(this@MainActivity)
                 ServiceLocator.getSpotifyController(this@MainActivity).togglePlayPauseOrResume()
                 statusMessage = getString(R.string.status_playlist_generated)
+
+                if (!isListenerEnabled) {
+                    showListenerPromptDialog = true
+                }
             } catch (e: Exception) {
                 if (e is HttpException && e.code() == 401) {
                     authManager.clearAuthData()
@@ -455,6 +526,55 @@ private fun HeaderBar() {
                 style = MaterialTheme.typography.labelMedium,
                 color = TextSecondary
             )
+        }
+    }
+}
+
+@Composable
+private fun BackgroundMonitoringWarningBanner(
+    onOpenSettings: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        border = BorderStroke(1.5.dp, Color(0xFFFFB74D))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "⚠️",
+                    fontSize = 20.sp
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.warning_banner_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFFFFB74D),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.warning_banner_msg),
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = onOpenSettings,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFFB74D),
+                    contentColor = DarkBackground
+                ),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.btn_enable_permission),
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
@@ -861,7 +981,7 @@ private fun Step3BackgroundListenerCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(1.dp, DarkCardBorder)
+        border = BorderStroke(1.dp, if (isEnabled) DarkCardBorder else Color(0xFFFFB74D))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -891,25 +1011,96 @@ private fun Step3BackgroundListenerCard(
                 )
             }
 
-            // Exibe o botão de atalho apenas se o monitoramento NÃO estiver ativo
-            if (!isEnabled) {
-                Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-                OutlinedButton(
+            if (!isEnabled) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
+                    color = Color(0xFF332B1A),
+                    border = BorderStroke(1.dp, Color(0xFFFFB74D).copy(alpha = 0.5f))
+                ) {
+                    Text(
+                        text = stringResource(R.string.step_3_warning_box),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFFFFE082),
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
                     onClick = onOpenSettings,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = SpotifyGreenBright
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFB74D),
+                        contentColor = DarkBackground
                     ),
-                    border = BorderStroke(1.dp, SpotifyGreen),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.btn_background_inactive),
-                        fontWeight = FontWeight.Bold,
-                        color = SpotifyGreenBright
+                        fontWeight = FontWeight.Bold
                     )
                 }
+            } else {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
+                    color = SpotifyGreenDark.copy(alpha = 0.4f),
+                    border = BorderStroke(1.dp, SpotifyGreen.copy(alpha = 0.5f))
+                ) {
+                    Text(
+                        text = stringResource(R.string.step_3_active_box),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = SpotifyGreenBright,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Step4WidgetCard(
+    onAddWidget: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        border = BorderStroke(1.dp, DarkCardBorder)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = stringResource(R.string.step_4_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.step_4_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Button(
+                onClick = onAddWidget,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = SpotifyGreen,
+                    contentColor = TextPrimary
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.btn_add_widget),
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -1020,8 +1211,12 @@ fun MainScreenPreview() {
                 )
                 Spacer(modifier = Modifier.height(14.dp))
                 Step3BackgroundListenerCard(
-                    isEnabled = true,
+                    isEnabled = false,
                     onOpenSettings = {}
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                Step4WidgetCard(
+                    onAddWidget = {}
                 )
             }
         }

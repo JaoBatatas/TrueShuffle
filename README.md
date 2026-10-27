@@ -17,6 +17,18 @@
 
 ---
 
+## ☕ Support & Donations
+
+If you enjoy using **True Shuffle** and want to support its ongoing development, consider buying me a coffee or sending a donation!
+
+- ☕ **Buy Me a Coffee / Ko-fi:** `[Your Link Here]`
+- 💖 **GitHub Sponsors:** `[Your Link Here]`
+- ⚡ **Pix (Brasil):** `[Sua Chave Pix Aqui]`
+
+Your support helps keep the project alive and free for everyone!
+
+---
+
 ## 🛠️ Tech Stack & Architecture
 
 - **Language:** Kotlin
@@ -63,4 +75,6 @@
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)** - see the [LICENSE](LICENSE) file for details.
+
+Under this license, you are free to study, modify, and distribute the software, provided that any derivative works remain 100% free and open-source under the same GPLv3 terms.

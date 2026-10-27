@@ -129,11 +129,12 @@ class SpotifyMediaTrackerService : NotificationListenerService() {
             } else null
 
             val cycleState = dao.getCycleState()
+            val currentIndex = cycleState?.currentIndex ?: 0
             val matchedTrack = when {
                 !mediaId.isNullOrEmpty() && mediaId.startsWith("spotify:track:") ->
-                    dao.getTrackByUri(mediaId)
+                    dao.getTrackByUri(mediaId, currentIndex)
                 !title.isNullOrEmpty() ->
-                    dao.getTrackByTitle(title)
+                    dao.getTrackByTitle(title, artist, currentIndex)
                 else -> null
             }
 

@@ -2,6 +2,7 @@ package com.example.trueshuffle.widget
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import androidx.annotation.Keep
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -343,40 +344,47 @@ class TrueShuffleWidget : GlanceAppWidget() {
     }
 }
 
+@Keep
 class PlayPauseAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         ServiceLocator.getSpotifyController(context).togglePlayPauseOrResume()
     }
 }
 
+@Keep
 class SkipNextAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         ServiceLocator.getSpotifyController(context).skipToNext()
     }
 }
 
+@Keep
 class SkipPreviousAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         ServiceLocator.getSpotifyController(context).skipToPrevious()
     }
 }
 
+@Keep
 class OpenSpotifyAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         ServiceLocator.getSpotifyController(context).openSpotifyPlayerView()
     }
 }
 
+@Keep
 class OpenSpotifyHomeAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         ServiceLocator.getSpotifyController(context).openSpotifyHome()
     }
 }
 
+@Keep
 class TrueShuffleWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = TrueShuffleWidget()
 }
 
+@Keep
 class ResumeCycleAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         ServiceLocator.getSpotifyController(context).resumeTrueShuffleCycle()

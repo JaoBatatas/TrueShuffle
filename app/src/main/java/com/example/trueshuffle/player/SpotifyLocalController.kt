@@ -80,6 +80,15 @@ class SpotifyLocalController(
             delay(500.milliseconds)
         } else {
             showToast("Abra o Spotify uma vez para reconectar")
+            try {
+                val uriIntent = Intent(Intent.ACTION_VIEW, state.playlistUri.toUri()).apply {
+                    setPackage("com.spotify.music")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(uriIntent)
+            } catch (e: Exception) {
+                Log.e("TrueShuffle", "Erro ao abrir playlist do ciclo como fallback", e)
+            }
         }
     }
 
@@ -217,20 +226,32 @@ class SpotifyLocalController(
 
             scope.launch(Dispatchers.IO) {
                 val cycleState = dao.getCycleState() ?: return@launch
-                val matchedTrack = dao.getTrackByUri(currentTrack.uri)
+                val matchedTrack = dao.getTrackByUri(currentTrack.uri, cycleState.currentIndex)
 
                 if (matchedTrack != null) {
-                    dao.updatePointer(matchedTrack.positionIndex, isPlaying)
+                    val isInSequence = kotlin.math.abs(matchedTrack.positionIndex - cycleState.currentIndex) <= 1
 
-                    if (matchedTrack.positionIndex >= cycleState.totalTracks - 1 && isPlaying) {
-                        if (currentTrack.duration > 0 && playerState.playbackPosition >= (currentTrack.duration * 0.9)) {
-                            val token = tokenProvider()
-                            cycleGenerator.generateNewShuffleCycle(token)
-                            togglePlayPauseOrResume()
+                    if (isInSequence) {
+                        dao.updatePointer(matchedTrack.positionIndex, isPlaying)
+
+                        if (matchedTrack.positionIndex >= cycleState.totalTracks - 1 && isPlaying) {
+                            if (currentTrack.duration > 0 && playerState.playbackPosition >= (currentTrack.duration * 0.9)) {
+                                val token = tokenProvider()
+                                cycleGenerator.generateNewShuffleCycle(token)
+                                togglePlayPauseOrResume()
+                            }
                         }
-                    }
 
-                    TrueShuffleWidget.pushUpdate(context)
+                        TrueShuffleWidget.pushUpdate(context, isInTrueShuffle = true)
+                    } else {
+                        TrueShuffleWidget.pushUpdate(
+                            context = context,
+                            isInTrueShuffle = false,
+                            externalTitle = matchedTrack.title,
+                            externalArtist = matchedTrack.artist,
+                            externalIsPlaying = isPlaying
+                        )
+                    }
                 }
             }
         }
@@ -256,7 +277,7 @@ class SpotifyLocalController(
                     }
 
                     override fun onFailure(error: Throwable) {
-                        Log.e("TrueShuffle", "AppRemote falhou: ${error.message}")
+                        Log.e("TrueShuffle", "AppRemote falhou (verifique a fingerprint SHA-1 no Spotify Dashboard): ${error.message}", error)
                         if (continuation.isActive) continuation.resume(null)
                     }
                 })

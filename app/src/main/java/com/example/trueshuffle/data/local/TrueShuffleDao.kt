@@ -122,10 +122,10 @@ class TrueShuffleDao(context: Context) : SQLiteOpenHelper(context, "true_shuffle
         return null
     }
 
-    suspend fun getTrackByUri(uri: String): ShuffledTrackEntity? = withContext(Dispatchers.IO) {
+    suspend fun getTrackByUri(uri: String, currentIndex: Int = 0): ShuffledTrackEntity? = withContext(Dispatchers.IO) {
         readableDatabase.rawQuery(
-            "SELECT * FROM shuffled_tracks WHERE trackUri = ? LIMIT 1",
-            arrayOf(uri)
+            "SELECT * FROM shuffled_tracks WHERE trackUri = ? ORDER BY ABS(positionIndex - ?) LIMIT 1",
+            arrayOf(uri, currentIndex.toString())
         ).use { cursor ->
             if (cursor.moveToFirst()) {
                 ShuffledTrackEntity(
@@ -138,13 +138,17 @@ class TrueShuffleDao(context: Context) : SQLiteOpenHelper(context, "true_shuffle
         }
     }
 
-    suspend fun getTrackByTitle(title: String, artist: String? = null): ShuffledTrackEntity? = withContext(Dispatchers.IO) {
+    suspend fun getTrackByTitle(title: String, artist: String? = null, currentIndex: Int = 0): ShuffledTrackEntity? = withContext(Dispatchers.IO) {
         val sql = if (!artist.isNullOrEmpty()) {
-            "SELECT * FROM shuffled_tracks WHERE LOWER(title) = LOWER(?) AND LOWER(artist) LIKE '%' || LOWER(?) || '%' LIMIT 1"
+            "SELECT * FROM shuffled_tracks WHERE LOWER(title) = LOWER(?) AND LOWER(artist) LIKE '%' || LOWER(?) || '%' ORDER BY ABS(positionIndex - ?) LIMIT 1"
         } else {
-            "SELECT * FROM shuffled_tracks WHERE LOWER(title) = LOWER(?) LIMIT 1"
+            "SELECT * FROM shuffled_tracks WHERE LOWER(title) = LOWER(?) ORDER BY ABS(positionIndex - ?) LIMIT 1"
         }
-        val args = if (!artist.isNullOrEmpty()) arrayOf(title, artist) else arrayOf(title)
+        val args = if (!artist.isNullOrEmpty()) {
+            arrayOf(title, artist, currentIndex.toString())
+        } else {
+            arrayOf(title, currentIndex.toString())
+        }
         readableDatabase.rawQuery(sql, args).use { cursor ->
             if (cursor.moveToFirst()) {
                 ShuffledTrackEntity(
@@ -157,11 +161,11 @@ class TrueShuffleDao(context: Context) : SQLiteOpenHelper(context, "true_shuffle
         }
     }
 
-    suspend fun getTrackByTitleAndArtist(title: String, artist: String): ShuffledTrackEntity? =
+    suspend fun getTrackByTitleAndArtist(title: String, artist: String, currentIndex: Int = 0): ShuffledTrackEntity? =
         withContext(Dispatchers.IO) {
             readableDatabase.rawQuery(
-                "SELECT * FROM shuffled_tracks WHERE LOWER(title) = LOWER(?) AND LOWER(artist) LIKE '%' || LOWER(?) || '%' LIMIT 1",
-                arrayOf(title.trim(), artist.trim())
+                "SELECT * FROM shuffled_tracks WHERE LOWER(title) = LOWER(?) AND LOWER(artist) LIKE '%' || LOWER(?) || '%' ORDER BY ABS(positionIndex - ?) LIMIT 1",
+                arrayOf(title.trim(), artist.trim(), currentIndex.toString())
             ).use { cursor ->
                 if (cursor.moveToFirst()) {
                     ShuffledTrackEntity(

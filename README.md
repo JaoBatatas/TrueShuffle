@@ -14,7 +14,6 @@
   - Dynamic background color extraction matching album cover colors ([Palette API](https://developer.android.com/develop/ui/views/graphics/palette)).
 - 📌 **One-Tap Widget Addition:** Built-in button to pin the Widget directly to your home screen using native Android APIs (`requestPinAppWidget`).
 - 🔄 **Background Synchronization:** Background service (`NotificationListenerService`) that detects track changes in Spotify and updates cycle progress and the Widget in real-time.
-- ⚠️ **Clear User Guidance:** Explicit warnings for required background notification access permissions and Spotify session expiration notifications.
 
 ---
 

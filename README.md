@@ -11,7 +11,7 @@
 - 📻 **5x1 Home Screen Widget:**
   - Displays album art, track title, artist, and current cycle progress (e.g., `24 / 120`).
   - Interactive player controls (Previous, Play/Pause, Next) operable directly from the Home Screen.
-  - Dynamic background color extraction matching album cover colors ([Palette API](https://developer.android.com/develop/ui/views/graphics/palette)).
+  - Dynamic background color extraction matching album cover colors.
 - 📌 **One-Tap Widget Addition:** Built-in button to pin the Widget directly to your home screen using native Android APIs (`requestPinAppWidget`).
 - 🔄 **Background Synchronization:** Background service (`NotificationListenerService`) that detects track changes in Spotify and updates cycle progress and the Widget in real-time.
 
@@ -33,7 +33,7 @@ Your support helps keep the project alive and free for everyone!
 - **UI Framework:** [Jetpack Compose](https://developer.android.com/jetpack/compose) & Material 3
 - **App Widgets:** [Jetpack Glance](https://developer.android.com/jetpack/compose/glance)
 - **Local Persistence:** [Room Database](https://developer.android.com/training/data-storage/room)
-- **Networking:** [Retrofit 2](https://square.github.io/retrofit/) + OkHttp 4 + [Spotify Web API](https://developer.spotify.com/documentation/web-api)
+- **Networking:** Retrofit 2 + OkHttp 4 + [Spotify Web API](https://developer.spotify.com/documentation/web-api)
 - **Playback Control:** Spotify App Remote SDK & MediaController
 - **Architecture:** ServiceLocator Pattern & Repository Data Access
 

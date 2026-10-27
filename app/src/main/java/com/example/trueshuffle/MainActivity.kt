@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
     private var isLoading by mutableStateOf(false)
     private var isListenerEnabled by mutableStateOf(false)
     private var isSpotifyConnected by mutableStateOf(false)
+    private var isSessionExpired by mutableStateOf(false)
     private var showListenerPromptDialog by mutableStateOf(false)
     private lateinit var authManager: AuthManager
 
@@ -132,6 +133,7 @@ class MainActivity : ComponentActivity() {
                             if (e is HttpException && e.code() == 401) {
                                 authManager.clearAuthData()
                                 isSpotifyConnected = false
+                                isSessionExpired = true
                                 statusMessage = "Sessão do Spotify expirada. Faça login novamente."
                             }
                             userPlaylists = emptyList()
@@ -154,6 +156,7 @@ class MainActivity : ComponentActivity() {
                                     showDisconnectDialog = false
                                     authManager.clearAuthData()
                                     isSpotifyConnected = false
+                                    isSessionExpired = false
                                     userPlaylists = emptyList()
                                     userAlbums = emptyList()
                                     statusMessage = getString(R.string.status_disconnected)
@@ -292,7 +295,11 @@ class MainActivity : ComponentActivity() {
                         Step1SpotifyCard(
                             isConnected = isSpotifyConnected,
                             isLoading = isLoading,
-                            onConnect = { startSpotifyLogin() },
+                            isSessionExpired = isSessionExpired,
+                            onConnect = {
+                                isSessionExpired = false
+                                startSpotifyLogin()
+                            },
                             onDisconnect = { showDisconnectDialog = true }
                         )
 
@@ -417,6 +424,7 @@ class MainActivity : ComponentActivity() {
                 if (token != null) {
                     authManager.saveAccessToken(token)
                     isSpotifyConnected = true
+                    isSessionExpired = false
                     statusMessage = getString(R.string.status_connected)
                 } else {
                     statusMessage = getString(R.string.status_auth_failed)
@@ -451,6 +459,7 @@ class MainActivity : ComponentActivity() {
                 if (e is HttpException && e.code() == 401) {
                     authManager.clearAuthData()
                     isSpotifyConnected = false
+                    isSessionExpired = true
                     statusMessage = "Sessão do Spotify expirada. Reconecte a conta no passo 1."
                 } else {
                     statusMessage = getString(R.string.status_error, e.localizedMessage ?: "")
@@ -696,6 +705,7 @@ private fun CycleHeroCard(
 private fun Step1SpotifyCard(
     isConnected: Boolean,
     isLoading: Boolean,
+    isSessionExpired: Boolean,
     onConnect: () -> Unit,
     onDisconnect: () -> Unit
 ) {
@@ -703,7 +713,7 @@ private fun Step1SpotifyCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(1.dp, DarkCardBorder)
+        border = BorderStroke(1.dp, if (!isConnected && isSessionExpired) StatusError.copy(alpha = 0.8f) else DarkCardBorder)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -753,6 +763,34 @@ private fun Step1SpotifyCard(
                     )
                 }
             } else {
+                if (isSessionExpired) {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        color = Color(0xFF3E1F1F),
+                        border = BorderStroke(1.dp, StatusError.copy(alpha = 0.6f))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "⚠️",
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.session_expired_warning),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = StatusError,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
                 Button(
                     onClick = onConnect,
                     enabled = !isLoading,
@@ -1194,6 +1232,7 @@ fun MainScreenPreview() {
                 Step1SpotifyCard(
                     isConnected = true,
                     isLoading = false,
+                    isSessionExpired = false,
                     onConnect = {},
                     onDisconnect = {}
                 )

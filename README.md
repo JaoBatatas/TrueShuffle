@@ -21,9 +21,7 @@
 
 If you enjoy using **True Shuffle** and want to support its ongoing development, consider buying me a coffee or sending a donation!
 
-- ☕ **Buy Me a Coffee / Ko-fi:** `[Your Link Here]`
-- 💖 **GitHub Sponsors:** `[Your Link Here]`
-- ⚡ **Pix (Brasil):** `[Sua Chave Pix Aqui]`
+- ☕ **Buy Me a Coffee:** [buymeacoffee.com/jaobatatas](https://buymeacoffee.com/jaobatatas)
 
 Your support helps keep the project alive and free for everyone!
 
